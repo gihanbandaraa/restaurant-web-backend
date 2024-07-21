@@ -36,18 +36,18 @@ export const signin = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password || email === "" || password === "") {
-    next(errorHandler(400, "All fields are required"));
+    return next(errorHandler(400, "All fields are required"));
   }
 
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      next(errorHandler(404, "User not found"));
+      return next(errorHandler(404, "User not found"));
     }
 
     const isPasswordValid = bcryptjs.compareSync(password, user.password);
     if (!isPasswordValid) {
-      next(errorHandler(400, "Invalid password"));
+      return next(errorHandler(400, "Invalid password"));
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "12h",
