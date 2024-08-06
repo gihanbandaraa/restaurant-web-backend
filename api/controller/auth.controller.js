@@ -49,9 +49,13 @@ export const signin = async (req, res, next) => {
     if (!isPasswordValid) {
       return next(errorHandler(400, "Invalid password"));
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "12h",
-    });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "12h",
+      }
+    );
 
     const { password: userPassword, ...userWithoutPassword } = user._doc;
     return res
@@ -70,9 +74,13 @@ export const google = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (user) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "12h",
-      });
+      const token = jwt.sign(
+        { id: user._id, isAdmin: user.isAdmin },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "12h",
+        }
+      );
 
       const { password: userPassword, ...userWithoutPassword } = user._doc;
 
@@ -82,12 +90,10 @@ export const google = async (req, res, next) => {
           httpOnly: true,
         })
         .json(userWithoutPassword);
-
     } else {
-
       const generatedPassword = Math.random().toString(36).slice(-8);
       const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
-      
+
       const newUser = new User({
         username:
           name.toLowerCase().split(" ").join("") +
@@ -97,9 +103,13 @@ export const google = async (req, res, next) => {
         profilePicture: googlePhotoUrl,
       });
       await newUser.save();
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "12h",
-      });
+      const token = jwt.sign(
+        { id: newUser._id, isAdmin: newUser.isAdmin },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "12h",
+        }
+      );
       const { password: userPassword, ...userWithoutPassword } = newUser._doc;
       return res
         .status(200)
