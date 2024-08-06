@@ -50,7 +50,7 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, "Invalid password"));
     }
     const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
+      { id: user._id, isAdmin: user.isAdmin, isStaff: user.isStaff },
       process.env.JWT_SECRET,
       {
         expiresIn: "12h",
@@ -75,7 +75,7 @@ export const google = async (req, res, next) => {
 
     if (user) {
       const token = jwt.sign(
-        { id: user._id, isAdmin: user.isAdmin },
+        { id: user._id, isAdmin: user.isAdmin, isStaff: user.isStaff },
         process.env.JWT_SECRET,
         {
           expiresIn: "12h",
@@ -104,7 +104,7 @@ export const google = async (req, res, next) => {
       });
       await newUser.save();
       const token = jwt.sign(
-        { id: newUser._id, isAdmin: newUser.isAdmin },
+        { id: newUser._id, isAdmin: newUser.isAdmin, isStaff: newUser.isStaff },
         process.env.JWT_SECRET,
         {
           expiresIn: "12h",
