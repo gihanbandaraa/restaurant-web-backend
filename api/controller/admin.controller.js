@@ -109,3 +109,46 @@ export const getMenuByCategory = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateMenu = async (req, res, next) => {
+  const { title, description, imageUrl, price, category, offers } = req.body;
+  const { id } = req.params;
+
+  try {
+    const menu = await Menu.findByIdAndUpdate(
+      id,
+      { title, description, imageUrl, price, category, offers },
+      { new: true }
+    );
+
+    if (!menu) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Menu Item not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "Menu Item Updated" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteMenu = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const menu = await Menu.findByIdAndDelete(id);
+
+    if (!menu) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Menu Item not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "Menu Item Deleted" });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -9,6 +9,8 @@ import {
   addMenu,
   getMenuByCategory,
   getMenu,
+  deleteMenu,
+  updateMenu,
 } from "../controller/admin.controller.js";
 
 const router = express.Router();
@@ -21,5 +23,7 @@ router.delete("/delete-category/:id", deleteCategory);
 router.post("/add-menu", addMenu);
 router.get("/get-menu", getMenu);
 router.get("/get-menu-category/:categoryId", getMenuByCategory);
+router.put("/update-menu/:id", updateMenu);
+router.delete("/delete-menu/:id", deleteMenu);
 
 export default router;
