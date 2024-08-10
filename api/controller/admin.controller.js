@@ -83,16 +83,27 @@ export const addMenu = async (req, res, next) => {
       category,
       offers,
     });
-    return res.status(201).json({ success: true, menu });
+    return res
+      .status(201)
+      .json({ success: true, message: "Menu Item Added Successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMenu = async (req, res, next) => {
+  try {
+    const menu = await Menu.find();
+    return res.status(200).json(menu);
   } catch (error) {
     next(error);
   }
 };
 
 export const getMenuByCategory = async (req, res, next) => {
-  const { categoryId } = req.params; 
+  const { categoryId } = req.params;
   try {
-    const menu = await Menu.find({ category: categoryId }); 
+    const menu = await Menu.find({ category: categoryId });
     return res.status(200).json(menu);
   } catch (error) {
     next(error);

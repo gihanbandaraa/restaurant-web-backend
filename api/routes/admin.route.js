@@ -5,7 +5,11 @@ import {
   updateCategory,
   deleteCategory,
 } from "../controller/admin.controller.js";
-import { addMenu, getMenuByCategory } from "../controller/admin.controller.js";
+import {
+  addMenu,
+  getMenuByCategory,
+  getMenu,
+} from "../controller/admin.controller.js";
 
 const router = express.Router();
 
@@ -15,6 +19,7 @@ router.put("/update-category/:id", updateCategory);
 router.delete("/delete-category/:id", deleteCategory);
 
 router.post("/add-menu", addMenu);
-router.get("/get-menu-category/:categoryId", getMenuByCategory); 
+router.get("/get-menu", getMenu);
+router.get("/get-menu-category/:categoryId", getMenuByCategory);
 
 export default router;
