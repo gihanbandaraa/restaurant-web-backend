@@ -152,3 +152,29 @@ export const deleteMenu = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getCategoryCounts = async (req, res, next) => {
+  try {
+    const counts = await Category.aggregate([
+      {
+        $lookup: {
+          from: "menus", // Collection name for the menu items
+          localField: "_id",
+          foreignField: "category",
+          as: "items",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          itemCount: { $size: "$items" }, // Count the number of items in each category
+        },
+      },
+    ]);
+
+    return res.status(200).json(counts);
+  } catch (error) {
+    next(error);
+  }
+};

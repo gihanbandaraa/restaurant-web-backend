@@ -11,6 +11,7 @@ import {
   getMenu,
   deleteMenu,
   updateMenu,
+  getCategoryCounts,
 } from "../controller/admin.controller.js";
 
 const router = express.Router();
@@ -25,5 +26,7 @@ router.get("/get-menu", getMenu);
 router.get("/get-menu-category/:categoryId", getMenuByCategory);
 router.put("/update-menu/:id", updateMenu);
 router.delete("/delete-menu/:id", deleteMenu);
+
+router.get("/get-category-counts", getCategoryCounts);
 
 export default router;
