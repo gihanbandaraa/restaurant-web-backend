@@ -14,6 +14,8 @@ import {
   getCategoryCounts,
 } from "../controller/admin.controller.js";
 
+import { addImage,getImages,deleteImage } from "../controller/admin.controller.js";
+
 const router = express.Router();
 
 router.post("/add-category", addCategory);
@@ -28,5 +30,10 @@ router.put("/update-menu/:id", updateMenu);
 router.delete("/delete-menu/:id", deleteMenu);
 
 router.get("/get-category-counts", getCategoryCounts);
+
+router.post("/add-image", addImage);
+router.get("/get-images", getImages);
+router.delete("/delete-image/:id", deleteImage);
+
 
 export default router;

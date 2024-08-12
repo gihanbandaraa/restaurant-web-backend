@@ -1,4 +1,5 @@
 import Category from "../models/categories.model.js";
+import Gallery from "../models/gallery.model.js";
 import Menu from "../models/menu.model.js";
 
 //Related to Category
@@ -158,7 +159,7 @@ export const getCategoryCounts = async (req, res, next) => {
     const counts = await Category.aggregate([
       {
         $lookup: {
-          from: "menus", // Collection name for the menu items
+          from: "menus",
           localField: "_id",
           foreignField: "category",
           as: "items",
@@ -168,12 +169,55 @@ export const getCategoryCounts = async (req, res, next) => {
         $project: {
           _id: 1,
           name: 1,
-          itemCount: { $size: "$items" }, // Count the number of items in each category
+          itemCount: { $size: "$items" },
         },
       },
     ]);
 
     return res.status(200).json(counts);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//Manage Gallery
+export const addImage = async (req, res, next) => {
+  const { imageUrl } = req.body;
+  if (!imageUrl) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Image URL is required" });
+  }
+  try {
+    const image = await Gallery.create({ imageUrl });
+    return res
+      .status(201)
+      .json({ success: true, message: "Image Added Successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getImages = async (req, res, next) => {
+  try {
+    const images = await Gallery.find();
+    return res.status(200).json(images);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteImage = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const image = await Gallery.findByIdAndDelete(id);
+    if (!image) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Image not found" });
+    }
+    return res.status(200).json({ success: true, message: "Image Deleted" });
   } catch (error) {
     next(error);
   }
