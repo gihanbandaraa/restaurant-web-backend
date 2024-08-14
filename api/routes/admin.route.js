@@ -16,6 +16,8 @@ import {
 
 import { addImage,getImages,deleteImage } from "../controller/admin.controller.js";
 
+import { getReservations,confirmReservation,rejectReservation } from "../controller/admin.controller.js";
+
 const router = express.Router();
 
 router.post("/add-category", addCategory);
@@ -35,5 +37,9 @@ router.post("/add-image", addImage);
 router.get("/get-images", getImages);
 router.delete("/delete-image/:id", deleteImage);
 
+
+router.get("/get-reservations", getReservations);
+router.put("/confirm-reservation/:id", confirmReservation);
+router.put("/reject-reservation/:id", rejectReservation);
 
 export default router;

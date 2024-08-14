@@ -1,6 +1,9 @@
 import Category from "../models/categories.model.js";
 import Gallery from "../models/gallery.model.js";
 import Menu from "../models/menu.model.js";
+import Reservation from "../models/reservations.model.js";
+
+import { sendConfirmationEmail, sendRejectionEmail } from "../utils/mailer.js";
 
 //Related to Category
 export const addCategory = async (req, res, next) => {
@@ -220,5 +223,70 @@ export const deleteImage = async (req, res, next) => {
     return res.status(200).json({ success: true, message: "Image Deleted" });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getReservations = async (req, res, next) => {
+  try {
+    const reservations = await Reservation.find();
+    const formattedReservations = reservations.map((reservation) => ({
+      ...reservation.toObject(),
+      date: reservation.date.toISOString().split("T")[0],
+    }));
+
+    return res.status(200).json(formattedReservations);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const confirmReservation = async (req, res) => {
+  try {
+    const reservation = await Reservation.findByIdAndUpdate(
+      req.params.id,
+      { status: "confirmed" },
+      { new: true }
+    );
+
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found." });
+    }
+
+    try {
+      await sendConfirmationEmail(reservation.email, {
+        date: reservation.date.toISOString().split("T")[0],
+        time: reservation.time,
+        people: reservation.people,
+        branch: reservation.branch,
+      });
+    } catch (emailError) {
+      console.error("Failed to send confirmation email:", emailError);
+      return res
+        .status(500)
+        .json({ message: "Reservation confirmed but failed to send email." });
+    }
+
+    res.status(200).json({ message: "Reservation confirmed successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to confirm the reservation." });
+  }
+};
+
+export const rejectReservation = async (req, res) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found." });
+    }
+    await Reservation.findByIdAndUpdate(req.params.id, { status: "rejected" });
+    await sendRejectionEmail(reservation.email, reservation);
+
+    res
+      .status(200)
+      .json({ message: "Reservation rejected successfully and email sent!" });
+  } catch (error) {
+    console.error("Error rejecting reservation:", error);
+    res.status(500).json({ message: "Failed to reject the reservation." });
   }
 };
