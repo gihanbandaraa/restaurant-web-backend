@@ -1,6 +1,7 @@
 import Category from "../models/categories.model.js";
 import Gallery from "../models/gallery.model.js";
 import Menu from "../models/menu.model.js";
+import Query from "../models/queries.model.js";
 import Reservation from "../models/reservations.model.js";
 
 import { sendConfirmationEmail, sendRejectionEmail } from "../utils/mailer.js";
@@ -226,6 +227,7 @@ export const deleteImage = async (req, res, next) => {
   }
 };
 
+//Manage Reservations
 export const getReservations = async (req, res, next) => {
   try {
     const reservations = await Reservation.find();
@@ -288,5 +290,48 @@ export const rejectReservation = async (req, res) => {
   } catch (error) {
     console.error("Error rejecting reservation:", error);
     res.status(500).json({ message: "Failed to reject the reservation." });
+  }
+};
+
+//Manage Queries
+
+export const addQuery = async (req, res, next) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+  try {
+    const query = await Query.create({ name, email, message });
+    return res
+      .status(201)
+      .json({ success: true, message: "Query Added Successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+export const getQueries = async (req, res, next) => {
+  try {
+    const queries = await Query.find();
+    return res.status(200).json(queries);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteQuery = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const query = await Query.findByIdAndDelete(id);
+    if (!query) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Query not found" });
+    }
+    return res.status(200).json({ success: true, message: "Query Deleted" });
+  } catch (error) {
+    next(error);
   }
 };

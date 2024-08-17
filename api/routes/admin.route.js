@@ -14,9 +14,23 @@ import {
   getCategoryCounts,
 } from "../controller/admin.controller.js";
 
-import { addImage,getImages,deleteImage } from "../controller/admin.controller.js";
+import {
+  addImage,
+  getImages,
+  deleteImage,
+} from "../controller/admin.controller.js";
 
-import { getReservations,confirmReservation,rejectReservation } from "../controller/admin.controller.js";
+import {
+  getReservations,
+  confirmReservation,
+  rejectReservation,
+} from "../controller/admin.controller.js";
+
+import {
+  addQuery,
+  getQueries,
+  deleteQuery,
+} from "../controller/admin.controller.js";
 
 const router = express.Router();
 
@@ -37,9 +51,12 @@ router.post("/add-image", addImage);
 router.get("/get-images", getImages);
 router.delete("/delete-image/:id", deleteImage);
 
-
 router.get("/get-reservations", getReservations);
 router.put("/confirm-reservation/:id", confirmReservation);
 router.put("/reject-reservation/:id", rejectReservation);
+
+router.post("/add-query", addQuery);
+router.get("/get-queries", getQueries);
+router.delete("/delete-query/:id", deleteQuery);
 
 export default router;
