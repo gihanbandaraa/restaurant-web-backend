@@ -1,10 +1,15 @@
 import Category from "../models/categories.model.js";
 import Gallery from "../models/gallery.model.js";
 import Menu from "../models/menu.model.js";
+import Order from "../models/orders.model.js";
 import Query from "../models/queries.model.js";
 import Reservation from "../models/reservations.model.js";
 
-import { sendConfirmationEmail, sendRejectionEmail } from "../utils/mailer.js";
+import {
+  sendConfirmationEmail,
+  sendRejectionEmail,
+  sendOrderReceivedEmail,
+} from "../utils/mailer.js";
 
 //Related to Category
 export const addCategory = async (req, res, next) => {
@@ -331,6 +336,108 @@ export const deleteQuery = async (req, res, next) => {
         .json({ success: false, message: "Query not found" });
     }
     return res.status(200).json({ success: true, message: "Query Deleted" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addOrder = async (req, res, next) => {
+  const {
+    user,
+    name,
+    email,
+    menuItems,
+    shippingAddress,
+    city,
+    phone,
+    totalPrice,
+    orderId,
+    paymentStatus,
+    branch,
+  } = req.body;
+
+  try {
+    const order = await Order.create({
+      user,
+      name,
+      email,
+      menuItems,
+      shippingAddress,
+      city,
+      phone,
+      totalPrice,
+      orderId,
+      paymentStatus,
+      branch,
+    });
+
+    const items = await Promise.all(
+      menuItems.map(async (item) => {
+        try {
+          const menuItem = await Menu.findById(item.menuItemId);
+          if (!menuItem) {
+            throw new Error(`Menu item with ID ${item.menuItemId} not found`);
+          }
+          return {
+            name: menuItem.title,
+            price: menuItem.price,
+            quantity: item.quantity,
+            imageUrl: menuItem.imageUrl,
+          };
+        } catch (error) {
+          console.error(
+            `Error fetching menu item with ID ${item.menuItemId}:`,
+            error.message
+          );
+          throw error;
+        }
+      })
+    );
+
+    try {
+      await sendOrderReceivedEmail(email, {
+        name,
+        orderId,
+        totalPrice,
+        shippingAddress,
+        city,
+        items,
+        branch,
+      });
+      console.log("Order received email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending order received email:", emailError.message);
+    }
+    return res.status(201).json({ success: true, order });
+  } catch (error) {
+    console.error("Error adding order:", error.message);
+    next(error);
+  }
+};
+export const getOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find();
+    return res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateOrderStatus = async (req, res, next) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  try {
+    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "Status Updated Successfully" });
   } catch (error) {
     next(error);
   }

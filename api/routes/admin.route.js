@@ -32,6 +32,8 @@ import {
   deleteQuery,
 } from "../controller/admin.controller.js";
 
+import { addOrder,getOrders,updateOrderStatus } from "../controller/admin.controller.js";
+
 const router = express.Router();
 
 router.post("/add-category", addCategory);
@@ -58,5 +60,9 @@ router.put("/reject-reservation/:id", rejectReservation);
 router.post("/add-query", addQuery);
 router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
+
+router.post("/add-order", addOrder);
+router.get("/get-orders", getOrders);
+router.put("/update-order-status/:id", updateOrderStatus);
 
 export default router;

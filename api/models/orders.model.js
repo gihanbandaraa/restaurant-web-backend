@@ -7,6 +7,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    orderId: {
+      type: String,
+      required: true,
+      unique: true, // Ensure orderId is unique
+    },
     name: {
       type: String,
       required: true,
@@ -17,9 +22,15 @@ const orderSchema = new mongoose.Schema(
     },
     menuItems: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Menu",
-        required: true,
+        menuItemId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Menu",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
       },
     ],
     shippingAddress: {
@@ -41,9 +52,17 @@ const orderSchema = new mongoose.Schema(
     totalPrice: {
       type: Number,
     },
+    paymentStatus: {
+      type: String,
+      default: "COD",
+    },
     dateOrdered: {
       type: Date,
       default: Date.now,
+    },
+    branch: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }
