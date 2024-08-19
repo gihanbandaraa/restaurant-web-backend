@@ -64,6 +64,9 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    specialNotes: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

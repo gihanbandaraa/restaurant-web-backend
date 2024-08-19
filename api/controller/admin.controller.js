@@ -354,6 +354,7 @@ export const addOrder = async (req, res, next) => {
     orderId,
     paymentStatus,
     branch,
+    specialNotes,
   } = req.body;
 
   try {
@@ -369,6 +370,7 @@ export const addOrder = async (req, res, next) => {
       orderId,
       paymentStatus,
       branch,
+      specialNotes,
     });
 
     const items = await Promise.all(
@@ -414,14 +416,37 @@ export const addOrder = async (req, res, next) => {
     next(error);
   }
 };
+
 export const getOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find();
+    // Extract query parameters for filtering and sorting
+    const { status, sortBy, sortOrder, branch, user } = req.query;
+
+    // Build the filter object
+    const filter = {};
+    if (status) filter.status = status;
+    if (branch) filter.branch = branch;
+    if (user) filter.user = user;
+
+    // Determine sorting order
+    const sortOptions = {};
+    if (sortBy) {
+      sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
+    } else {
+      sortOptions.createdAt = -1; // Default to sorting by creation date descending
+    }
+
+    // Populate related data (e.g., menu items)
+    const orders = await Order.find(filter)
+      .sort(sortOptions)
+      .populate("menuItems.menuItemId", "title price imageUrl");
+
     return res.status(200).json(orders);
   } catch (error) {
     next(error);
   }
 };
+
 
 export const updateOrderStatus = async (req, res, next) => {
   const { status } = req.body;
