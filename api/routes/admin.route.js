@@ -32,7 +32,12 @@ import {
   deleteQuery,
 } from "../controller/admin.controller.js";
 
-import { addOrder,getOrders,updateOrderStatus } from "../controller/admin.controller.js";
+import {
+  addOrder,
+  getOrders,
+  markOrderAsReady,
+  markOrderAsDelivered,
+} from "../controller/admin.controller.js";
 
 const router = express.Router();
 
@@ -63,6 +68,7 @@ router.delete("/delete-query/:id", deleteQuery);
 
 router.post("/add-order", addOrder);
 router.get("/get-orders", getOrders);
-router.put("/update-order-status/:id", updateOrderStatus);
+router.put("/mark-order-as-ready/:id", markOrderAsReady);
+router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
 
 export default router;

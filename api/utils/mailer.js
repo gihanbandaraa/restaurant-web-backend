@@ -135,25 +135,35 @@ const sendOrderReceivedEmail = (to, orderDetails) => {
           <div style="text-align: center; padding: 20px 0; background-color: #FF4D4D; border-radius: 5px;">
             <h2 style="color: #FFF;">Order Received!</h2>
           </div>
-          <p style="font-size: 16px; margin-top: 20px;">Dear ${orderDetails.name},</p>
+          <p style="font-size: 16px; margin-top: 20px;">Dear ${
+            orderDetails.name
+          },</p>
           <p style="font-size: 16px;">Thank you for your order! We are excited to prepare your meal. Here are the details:</p>
           
           <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <tr style="background-color: #FFEDED;">
               <td style="padding: 10px; border: 1px solid #FF4D4D;">Order ID:</td>
-              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${orderDetails.orderId}</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.orderId
+              }</td>
             </tr>
             <tr style="background-color: #FFEDED;">
               <td style="padding: 10px; border: 1px solid #FF4D4D;">Total Price:</td>
-              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">Rs.${orderDetails.totalPrice}</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">Rs.${
+                orderDetails.totalPrice
+              }</td>
             </tr>
             <tr style="background-color: #FFEDED;">
               <td style="padding: 10px; border: 1px solid #FF4D4D;">Shipping Address:</td>
-              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${orderDetails.shippingAddress}</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.shippingAddress
+              }</td>
             </tr>
             <tr style="background-color: #FFEDED;">
               <td style="padding: 10px; border: 1px solid #FF4D4D;">City:</td>
-              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${orderDetails.city}</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.city
+              }</td>
             </tr>
           </table>
 
@@ -162,10 +172,20 @@ const sendOrderReceivedEmail = (to, orderDetails) => {
             .map(
               (item) => `
               <div style="margin-top: 15px; border: 1px solid #FF4D4D; border-radius: 5px; padding: 10px; background-color: #FFEDED;">
-                <p style="font-size: 16px; margin: 0; font-weight: bold; color: #FF4D4D;">${item.name}</p>
-                <p style="font-size: 14px; margin: 5px 0;">Quantity: ${item.quantity}</p>
-                <p style="font-size: 14px; margin: 0;">Price: Rs.${item.price}</p>
-                ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 100px; height: auto; margin-top: 10px;">` : ''}
+                <p style="font-size: 16px; margin: 0; font-weight: bold; color: #FF4D4D;">${
+                  item.name
+                }</p>
+                <p style="font-size: 14px; margin: 5px 0;">Quantity: ${
+                  item.quantity
+                }</p>
+                <p style="font-size: 14px; margin: 0;">Price: Rs.${
+                  item.price
+                }</p>
+                ${
+                  item.imageUrl
+                    ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 100px; height: auto; margin-top: 10px;">`
+                    : ""
+                }
               </div>
             `
             )
@@ -188,5 +208,184 @@ const sendOrderReceivedEmail = (to, orderDetails) => {
   return transporter.sendMail(mailOptions);
 };
 
+const sendOrderReadyEmail = (to, orderDetails) => {
+  const mailOptions = {
+    from: `"Serendib Savor" <${process.env.EMAIL_ADDRESS}>`,
+    to: to,
+    subject: "Your Order is Ready for Pickup!",
+    html: `
+      <html>
+        <head>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+        </head>
+        <body style="font-family: 'Poppins', Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+          <div style="text-align: center; padding: 20px 0; background-color: #FF4D4D; border-radius: 5px;">
+            <h2 style="color: #FFF;">Order Ready for Pickup!</h2>
+          </div>
+          <p style="font-size: 16px; margin-top: 20px;">Dear ${
+            orderDetails.name
+          },</p>
+          <p style="font-size: 16px;">Good news! Your order is now ready for pickup. Here are the details:</p>
+          
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">Order ID:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.orderId
+              }</td>
+            </tr>
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">Total Price:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">Rs.${
+                orderDetails.totalPrice
+              }</td>
+            </tr>
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">Shipping Address:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.shippingAddress
+              }</td>
+            </tr>
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">City:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.city
+              }</td>
+            </tr>
+          </table>
 
-export { sendConfirmationEmail, sendRejectionEmail, sendOrderReceivedEmail };
+          <h3 style="margin-top: 30px; color: #FF4D4D;">Ordered Items:</h3>
+          ${orderDetails.items
+            .map(
+              (item) => `
+              <div style="margin-top: 15px; border: 1px solid #FF4D4D; border-radius: 5px; padding: 10px; background-color: #FFEDED;">
+                <p style="font-size: 16px; margin: 0; font-weight: bold; color: #FF4D4D;">${
+                  item.name
+                }</p>
+                <p style="font-size: 14px; margin: 5px 0;">Quantity: ${
+                  item.quantity
+                }</p>
+                <p style="font-size: 14px; margin: 0;">Price: Rs.${
+                  item.price
+                }</p>
+                ${
+                  item.imageUrl
+                    ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 100px; height: auto; margin-top: 10px;">`
+                    : ""
+                }
+              </div>
+            `
+            )
+            .join("")}
+
+          <p style="font-size: 16px; margin-top: 20px;">
+            We hope you enjoy your meal! 🍽️
+          </p>
+          <p style="font-size: 16px; margin-top: 20px;">
+            <strong>Serendib Savor</strong><br/>
+            123 Main Street, ${orderDetails.branch}<br/>
+            <a href="tel:+94123456789" style="color: #FF4D4D; text-decoration: none;">+94 123 456 789</a><br/>
+            <a href="mailto:info@serendibsavor.com" style="color: #FF4D4D; text-decoration: none;">info@serendibsavor.com</a>
+          </p>
+        </body>
+      </html>
+    `,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+const sendOrderDeliveredEmail = (to, orderDetails) => {
+  const mailOptions = {
+    from: `"Serendib Savor" <${process.env.EMAIL_ADDRESS}>`,
+    to: to,
+    subject: "Your Order Has Been Delivered!",
+    html: `
+      <html>
+        <head>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+        </head>
+        <body style="font-family: 'Poppins', Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+          <div style="text-align: center; padding: 20px 0; background-color: #FF4D4D; border-radius: 5px;">
+            <h2 style="color: #FFF;">Order Delivered!</h2>
+          </div>
+          <p style="font-size: 16px; margin-top: 20px;">Dear ${
+            orderDetails.name
+          },</p>
+          <p style="font-size: 16px;">We are delighted to inform you that your order has been successfully delivered! Here are the details:</p>
+          
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">Order ID:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.orderId
+              }</td>
+            </tr>
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">Total Price:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">Rs.${
+                orderDetails.totalPrice
+              }</td>
+            </tr>
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">Shipping Address:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.shippingAddress
+              }</td>
+            </tr>
+            <tr style="background-color: #FFEDED;">
+              <td style="padding: 10px; border: 1px solid #FF4D4D;">City:</td>
+              <td style="padding: 10px; border: 1px solid #FF4D4D; font-weight: bold;">${
+                orderDetails.city
+              }</td>
+            </tr>
+          </table>
+
+          <h3 style="margin-top: 30px; color: #FF4D4D;">Ordered Items:</h3>
+          ${orderDetails.items
+            .map(
+              (item) => `
+              <div style="margin-top: 15px; border: 1px solid #FF4D4D; border-radius: 5px; padding: 10px; background-color: #FFEDED;">
+                <p style="font-size: 16px; margin: 0; font-weight: bold; color: #FF4D4D;">${
+                  item.name
+                }</p>
+                <p style="font-size: 14px; margin: 5px 0;">Quantity: ${
+                  item.quantity
+                }</p>
+                <p style="font-size: 14px; margin: 0;">Price: Rs.${
+                  item.price
+                }</p>
+                ${
+                  item.imageUrl
+                    ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 100px; height: auto; margin-top: 10px;">`
+                    : ""
+                }
+              </div>
+            `
+            )
+            .join("")}
+
+          <p style="font-size: 16px; margin-top: 20px;">
+            We hope you enjoy your meal! If you have any questions or feedback, feel free to reach out to us.
+          </p>
+          <p style="font-size: 16px; margin-top: 20px;">
+            <strong>Serendib Savor</strong><br/>
+            123 Main Street, ${orderDetails.branch}<br/>
+            <a href="tel:+94123456789" style="color: #FF4D4D; text-decoration: none;">+94 123 456 789</a><br/>
+            <a href="mailto:info@serendibsavor.com" style="color: #FF4D4D; text-decoration: none;">info@serendibsavor.com</a>
+          </p>
+        </body>
+      </html>
+    `,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export {
+  sendConfirmationEmail,
+  sendRejectionEmail,
+  sendOrderReceivedEmail,
+  sendOrderReadyEmail,
+  sendOrderDeliveredEmail,
+};

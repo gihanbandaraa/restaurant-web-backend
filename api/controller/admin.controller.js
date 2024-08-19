@@ -9,6 +9,8 @@ import {
   sendConfirmationEmail,
   sendRejectionEmail,
   sendOrderReceivedEmail,
+  sendOrderReadyEmail,
+  sendOrderDeliveredEmail
 } from "../utils/mailer.js";
 
 //Related to Category
@@ -419,24 +421,18 @@ export const addOrder = async (req, res, next) => {
 
 export const getOrders = async (req, res, next) => {
   try {
-    // Extract query parameters for filtering and sorting
     const { status, sortBy, sortOrder, branch, user } = req.query;
-
-    // Build the filter object
     const filter = {};
     if (status) filter.status = status;
     if (branch) filter.branch = branch;
     if (user) filter.user = user;
 
-    // Determine sorting order
     const sortOptions = {};
     if (sortBy) {
       sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
     } else {
-      sortOptions.createdAt = -1; // Default to sorting by creation date descending
+      sortOptions.createdAt = -1;
     }
-
-    // Populate related data (e.g., menu items)
     const orders = await Order.find(filter)
       .sort(sortOptions)
       .populate("menuItems.menuItemId", "title price imageUrl");
@@ -447,23 +443,79 @@ export const getOrders = async (req, res, next) => {
   }
 };
 
-
-export const updateOrderStatus = async (req, res, next) => {
-  const { status } = req.body;
-  const { id } = req.params;
-
+export const markOrderAsReady = async (req, res, next) => {
   try {
-    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+    const order = await Order.findById(req.params.id).populate('menuItems.menuItemId', 'title price imageUrl');
 
     if (!order) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order not found" });
+      return res.status(404).json({ message: "Order not found." });
     }
-    return res
-      .status(200)
-      .json({ success: true, message: "Status Updated Successfully" });
+    await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: "Ready" },
+      { new: true }
+    );
+    const items = order.menuItems.map(item => ({
+      name: item.menuItemId.title,
+      price: item.menuItemId.price,
+      quantity: item.quantity,
+      imageUrl: item.menuItemId.imageUrl,
+    }));
+
+    try {
+      await sendOrderReadyEmail(order.email, {
+        name: order.name,
+        orderId: order.orderId,
+        items,
+        branch: order.branch,
+      });
+      console.log("Order ready email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending order ready email:", emailError.message);
+      return res.status(500).json({ message: "Order marked as ready but failed to send email." });
+    }
+
+    res.status(200).json({ message: "Order marked as ready." });
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: "Failed to mark order as ready." });
   }
 };
+
+export const markOrderAsDelivered = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id).populate('menuItems.menuItemId', 'title price imageUrl');
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+    await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: "Delivered" },
+      { new: true }
+    );
+
+    const items = order.menuItems.map(item => ({
+      name: item.menuItemId.title,
+      price: item.menuItemId.price,
+      quantity: item.quantity,
+      imageUrl: item.menuItemId.imageUrl,
+    }));
+    try {
+      await sendOrderDeliveredEmail(order.email, {
+        name: order.name,
+        orderId: order.orderId,
+        items,
+        branch: order.branch,
+      });
+      console.log("Order delivered email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending order delivered email:", emailError.message);
+      return res.status(500).json({ message: "Order marked as delivered but failed to send email." });
+    }
+
+    res.status(200).json({ message: "Order marked as delivered." });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to mark order as delivered." });
+  }
+};
+
