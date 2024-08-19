@@ -1,6 +1,7 @@
 import Category from "../models/categories.model.js";
 import Gallery from "../models/gallery.model.js";
 import Menu from "../models/menu.model.js";
+import Offers from "../models/offers.model.js";
 import Order from "../models/orders.model.js";
 import Query from "../models/queries.model.js";
 import Reservation from "../models/reservations.model.js";
@@ -518,15 +519,83 @@ export const markOrderAsDelivered = async (req, res, next) => {
       console.log("Order delivered email sent successfully");
     } catch (emailError) {
       console.error("Error sending order delivered email:", emailError.message);
-      return res
-        .status(500)
-        .json({
-          message: "Order marked as delivered but failed to send email.",
-        });
+      return res.status(500).json({
+        message: "Order marked as delivered but failed to send email.",
+      });
     }
 
     res.status(200).json({ message: "Order marked as delivered." });
   } catch (error) {
     res.status(500).json({ message: "Failed to mark order as delivered." });
+  }
+};
+
+export const addOffer = async (req, res, next) => {
+  const { title, description, imageUrl, buttonText } = req.body;
+  if (!title || !description || !imageUrl || !buttonText) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+  try {
+    const offer = await Offers.create({
+      title,
+      description,
+      imageUrl,
+      buttonText,
+    });
+    return res
+      .status(201)
+      .json({ success: true, message: "Offer Added Successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOffers = async (req, res, next) => {
+  try {
+    const offers = await Offers.find();
+    return res.status(200).json(offers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateOffer = async (req, res, next) => {
+  const { title, description, imageUrl, buttonText } = req.body;
+  const { id } = req.params;
+
+  try {
+    const offer = await Offers.findByIdAndUpdate(
+      id,
+      { title, description, imageUrl, buttonText },
+      { new: true }
+    );
+
+    if (!offer) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Offer not found" });
+    }
+    return res.status(200).json({ success: true, message: "Offer Updated" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteOffer = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const offer = await Offers.findByIdAndDelete(id);
+
+    if (!offer) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Offer not found" });
+    }
+    return res.status(200).json({ success: true, message: "Offer Deleted" });
+  } catch (error) {
+    next(error);
   }
 };

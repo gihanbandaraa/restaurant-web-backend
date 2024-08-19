@@ -39,6 +39,13 @@ import {
   markOrderAsDelivered,
 } from "../controller/admin.controller.js";
 
+import {
+  addOffer,
+  getOffers,
+  updateOffer,
+  deleteOffer,
+} from "../controller/admin.controller.js";
+
 const router = express.Router();
 
 router.post("/add-category", addCategory);
@@ -70,5 +77,10 @@ router.post("/add-order", addOrder);
 router.get("/get-orders", getOrders);
 router.put("/mark-order-as-ready/:id", markOrderAsReady);
 router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
+
+router.post("/add-offer", addOffer);
+router.get("/get-offers", getOffers);
+router.put("/update-offer/:id", updateOffer);
+router.delete("/delete-offer/:id", deleteOffer);
 
 export default router;
