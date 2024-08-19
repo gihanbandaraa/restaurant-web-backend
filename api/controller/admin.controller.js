@@ -10,7 +10,7 @@ import {
   sendRejectionEmail,
   sendOrderReceivedEmail,
   sendOrderReadyEmail,
-  sendOrderDeliveredEmail
+  sendOrderDeliveredEmail,
 } from "../utils/mailer.js";
 
 //Related to Category
@@ -445,7 +445,10 @@ export const getOrders = async (req, res, next) => {
 
 export const markOrderAsReady = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id).populate('menuItems.menuItemId', 'title price imageUrl');
+    const order = await Order.findById(req.params.id).populate(
+      "menuItems.menuItemId",
+      "title price imageUrl"
+    );
 
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
@@ -455,7 +458,7 @@ export const markOrderAsReady = async (req, res, next) => {
       { status: "Ready" },
       { new: true }
     );
-    const items = order.menuItems.map(item => ({
+    const items = order.menuItems.map((item) => ({
       name: item.menuItemId.title,
       price: item.menuItemId.price,
       quantity: item.quantity,
@@ -472,7 +475,9 @@ export const markOrderAsReady = async (req, res, next) => {
       console.log("Order ready email sent successfully");
     } catch (emailError) {
       console.error("Error sending order ready email:", emailError.message);
-      return res.status(500).json({ message: "Order marked as ready but failed to send email." });
+      return res
+        .status(500)
+        .json({ message: "Order marked as ready but failed to send email." });
     }
 
     res.status(200).json({ message: "Order marked as ready." });
@@ -483,7 +488,10 @@ export const markOrderAsReady = async (req, res, next) => {
 
 export const markOrderAsDelivered = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id).populate('menuItems.menuItemId', 'title price imageUrl');
+    const order = await Order.findById(req.params.id).populate(
+      "menuItems.menuItemId",
+      "title price imageUrl"
+    );
 
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
@@ -494,7 +502,7 @@ export const markOrderAsDelivered = async (req, res, next) => {
       { new: true }
     );
 
-    const items = order.menuItems.map(item => ({
+    const items = order.menuItems.map((item) => ({
       name: item.menuItemId.title,
       price: item.menuItemId.price,
       quantity: item.quantity,
@@ -510,7 +518,11 @@ export const markOrderAsDelivered = async (req, res, next) => {
       console.log("Order delivered email sent successfully");
     } catch (emailError) {
       console.error("Error sending order delivered email:", emailError.message);
-      return res.status(500).json({ message: "Order marked as delivered but failed to send email." });
+      return res
+        .status(500)
+        .json({
+          message: "Order marked as delivered but failed to send email.",
+        });
     }
 
     res.status(200).json({ message: "Order marked as delivered." });
@@ -518,4 +530,3 @@ export const markOrderAsDelivered = async (req, res, next) => {
     res.status(500).json({ message: "Failed to mark order as delivered." });
   }
 };
-
