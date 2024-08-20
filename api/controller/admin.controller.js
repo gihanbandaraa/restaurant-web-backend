@@ -12,6 +12,7 @@ import {
   sendOrderReceivedEmail,
   sendOrderReadyEmail,
   sendOrderDeliveredEmail,
+  sendQueryReplyEmail,
 } from "../utils/mailer.js";
 
 //Related to Category
@@ -303,22 +304,6 @@ export const rejectReservation = async (req, res) => {
 
 //Manage Queries
 
-export const addQuery = async (req, res, next) => {
-  const { name, email, message } = req.body;
-  if (!name || !email || !message) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
-  }
-  try {
-    const query = await Query.create({ name, email, message });
-    return res
-      .status(201)
-      .json({ success: true, message: "Query Added Successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
 export const getQueries = async (req, res, next) => {
   try {
     const queries = await Query.find();
@@ -343,6 +328,38 @@ export const deleteQuery = async (req, res, next) => {
     next(error);
   }
 };
+
+export const replyQuery = async (req, res, next) => {
+  const { id } = req.params;
+  const { subject, message, receiverEmail, status } = req.body;
+
+  try {
+    const updatedQuery = await Query.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedQuery) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Query not found" });
+    }
+
+    await sendQueryReplyEmail(receiverEmail, {
+      subject,
+      message,
+      receiverName: updatedQuery.name,
+    });
+
+    return res.status(200).json({ success: true, status: updatedQuery });
+  } catch (error) {
+    console.error("Error handling query reply:", error);
+    next(error);
+  }
+};
+
+//Related Manage Orders
 
 export const addOrder = async (req, res, next) => {
   const {
@@ -530,6 +547,7 @@ export const markOrderAsDelivered = async (req, res, next) => {
   }
 };
 
+//Related to Offers
 export const addOffer = async (req, res, next) => {
   const { title, description, imageUrl, buttonText } = req.body;
   if (!title || !description || !imageUrl || !buttonText) {

@@ -1,4 +1,5 @@
 import Reservation from "../models/reservations.model.js";
+import Query from "../models/queries.model.js";
 
 export const test = (req, res) => {
   res.json({ message: "Hello World!" });
@@ -13,7 +14,7 @@ export const signout = (req, res, next) => {
 };
 
 export const makeReservation = async (req, res, next) => {
-  const { name, email, phone, date, time, people, message,branch } = req.body;
+  const { name, email, phone, date, time, people, message, branch } = req.body;
 
   if (!name || !email || !phone || !date || !time || !people || !branch) {
     return res

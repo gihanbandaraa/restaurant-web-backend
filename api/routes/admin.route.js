@@ -27,9 +27,9 @@ import {
 } from "../controller/admin.controller.js";
 
 import {
-  addQuery,
   getQueries,
   deleteQuery,
+  replyQuery,
 } from "../controller/admin.controller.js";
 
 import {
@@ -71,6 +71,7 @@ router.put("/reject-reservation/:id", rejectReservation);
 
 router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
+router.put("/reply-query/:id", replyQuery);
 
 router.post("/add-order", addOrder);
 router.get("/get-orders", getOrders);

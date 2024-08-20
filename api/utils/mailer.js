@@ -382,10 +382,48 @@ const sendOrderDeliveredEmail = (to, orderDetails) => {
   return transporter.sendMail(mailOptions);
 };
 
+const sendQueryReplyEmail = (to, queryDetails) => {
+  const mailOptions = {
+    from: `"Serendib Savor" <${process.env.EMAIL_ADDRESS}>`,
+    to: to,
+    subject: `Response to Your Query: ${queryDetails.subject}`,
+    html: `
+      <html>
+        <head>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+        </head>
+        <body style="font-family: 'Poppins', Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+          <div style="text-align: center; padding: 20px 0; background-color: #FF4D4D; border-radius: 5px;">
+            <h2 style="color: #FFF;">Reply to Your Query</h2>
+          </div>
+          <p style="font-size: 16px; margin-top: 20px;">Dear ${queryDetails.receiverName},</p>
+          <p style="font-size: 16px;">Thank you for reaching out to us. Here is the response to your query:</p>
+          
+          <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">Subject: ${queryDetails.subject}</p>
+          <p style="font-size: 16px; margin-top: 10px;">${queryDetails.message}</p>
+
+          <p style="font-size: 16px; margin-top: 20px;">
+            If you have any more questions or need further assistance, feel free to contact us.
+          </p>
+          <p style="font-size: 16px; margin-top: 20px;">
+            <strong>Serendib Savor</strong><br/>
+            123 Main Street,Colombo<br/>
+            <a href="tel:+94123456789" style="color: #FF4D4D; text-decoration: none;">+94 123 456 789</a><br/>
+            <a href="mailto:info@serendibsavor.com" style="color: #FF4D4D; text-decoration: none;">info@serendibsavor.com</a>
+          </p>
+        </body>
+      </html>
+    `,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
 export {
   sendConfirmationEmail,
   sendRejectionEmail,
   sendOrderReceivedEmail,
   sendOrderReadyEmail,
   sendOrderDeliveredEmail,
+  sendQueryReplyEmail,
 };
