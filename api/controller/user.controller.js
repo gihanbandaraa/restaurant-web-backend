@@ -42,3 +42,20 @@ export const makeReservation = async (req, res, next) => {
     next(error);
   }
 };
+
+export const addQuery = async (req, res, next) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+  try {
+    const query = await Query.create({ name, email, message });
+    return res
+      .status(201)
+      .json({ success: true, message: "Query Added Successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

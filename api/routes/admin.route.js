@@ -69,7 +69,6 @@ router.get("/get-reservations", getReservations);
 router.put("/confirm-reservation/:id", confirmReservation);
 router.put("/reject-reservation/:id", rejectReservation);
 
-router.post("/add-query", addQuery);
 router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
 
