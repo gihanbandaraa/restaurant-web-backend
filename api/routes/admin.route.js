@@ -54,6 +54,12 @@ import {
   getTopMenuItems,
 } from "../controller/admin.controller.js";
 
+import {
+  getAllStaff,
+  updateStaffAccount,
+  deleteStaffAccount,
+} from "../controller/admin.controller.js";
+
 const router = express.Router();
 
 router.post("/add-category", addCategory);
@@ -96,5 +102,9 @@ router.get("/top-menu-items", getTopMenuItems);
 router.get("/sales-performance", getSalesPerformance);
 router.get("/recent-orders", getRecentOrders);
 router.get("/user-activity", getUserActivity);
+
+router.get("/get-all-staff", getAllStaff);
+router.put("/update-staff-account/:id", updateStaffAccount);
+router.delete("/delete-staff-account/:id", deleteStaffAccount);
 
 export default router;
