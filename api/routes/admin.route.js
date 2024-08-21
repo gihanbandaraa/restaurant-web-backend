@@ -4,6 +4,9 @@ import {
   getCategories,
   updateCategory,
   deleteCategory,
+  getSalesPerformance,
+  getRecentOrders,
+  getUserActivity,
 } from "../controller/admin.controller.js";
 import {
   addMenu,
@@ -27,9 +30,9 @@ import {
 } from "../controller/admin.controller.js";
 
 import {
-  addQuery,
   getQueries,
   deleteQuery,
+  replyQuery,
 } from "../controller/admin.controller.js";
 
 import {
@@ -44,6 +47,11 @@ import {
   getOffers,
   updateOffer,
   deleteOffer,
+} from "../controller/admin.controller.js";
+
+import {
+  getDashboardData,
+  getTopMenuItems,
 } from "../controller/admin.controller.js";
 
 const router = express.Router();
@@ -69,9 +77,9 @@ router.get("/get-reservations", getReservations);
 router.put("/confirm-reservation/:id", confirmReservation);
 router.put("/reject-reservation/:id", rejectReservation);
 
-router.post("/add-query", addQuery);
 router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
+router.put("/reply-query/:id", replyQuery);
 
 router.post("/add-order", addOrder);
 router.get("/get-orders", getOrders);
@@ -82,5 +90,11 @@ router.post("/add-offer", addOffer);
 router.get("/get-offers", getOffers);
 router.put("/update-offer/:id", updateOffer);
 router.delete("/delete-offer/:id", deleteOffer);
+
+router.get("/get-dashboard-data", getDashboardData);
+router.get("/top-menu-items", getTopMenuItems);
+router.get("/sales-performance", getSalesPerformance);
+router.get("/recent-orders", getRecentOrders);
+router.get("/user-activity", getUserActivity);
 
 export default router;

@@ -7,6 +7,8 @@ import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import adminRoutes from "./routes/admin.route.js";
 
+
+
 dotenv.config();
 mongoose
   .connect(process.env.MONGODB_CONNECTION_STRING)
@@ -20,6 +22,7 @@ mongoose
 // Create express app
 const app = express();
 app.use(express.json());
+
 
 app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");

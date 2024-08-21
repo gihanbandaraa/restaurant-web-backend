@@ -5,6 +5,8 @@ import Offers from "../models/offers.model.js";
 import Order from "../models/orders.model.js";
 import Query from "../models/queries.model.js";
 import Reservation from "../models/reservations.model.js";
+import User from "../models/user.model.js";
+
 
 import {
   sendConfirmationEmail,
@@ -12,7 +14,8 @@ import {
   sendOrderReceivedEmail,
   sendOrderReadyEmail,
   sendOrderDeliveredEmail,
-} from "../utils/mailer.js";
+  sendQueryReplyEmail,
+} from "../utils/mailer.js"; 
 
 //Related to Category
 export const addCategory = async (req, res, next) => {
@@ -303,22 +306,6 @@ export const rejectReservation = async (req, res) => {
 
 //Manage Queries
 
-export const addQuery = async (req, res, next) => {
-  const { name, email, message } = req.body;
-  if (!name || !email || !message) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
-  }
-  try {
-    const query = await Query.create({ name, email, message });
-    return res
-      .status(201)
-      .json({ success: true, message: "Query Added Successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
 export const getQueries = async (req, res, next) => {
   try {
     const queries = await Query.find();
@@ -343,6 +330,38 @@ export const deleteQuery = async (req, res, next) => {
     next(error);
   }
 };
+
+export const replyQuery = async (req, res, next) => {
+  const { id } = req.params;
+  const { subject, message, receiverEmail, status } = req.body;
+
+  try {
+    const updatedQuery = await Query.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedQuery) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Query not found" });
+    }
+
+    await sendQueryReplyEmail(receiverEmail, {
+      subject,
+      message,
+      receiverName: updatedQuery.name,
+    });
+
+    return res.status(200).json({ success: true, status: updatedQuery });
+  } catch (error) {
+    console.error("Error handling query reply:", error);
+    next(error);
+  }
+};
+
+//Related Manage Orders
 
 export const addOrder = async (req, res, next) => {
   const {
@@ -530,6 +549,7 @@ export const markOrderAsDelivered = async (req, res, next) => {
   }
 };
 
+//Related to Offers
 export const addOffer = async (req, res, next) => {
   const { title, description, imageUrl, buttonText } = req.body;
   if (!title || !description || !imageUrl || !buttonText) {
@@ -599,3 +619,182 @@ export const deleteOffer = async (req, res, next) => {
     next(error);
   }
 };
+
+//Admin Dashboard
+
+export const getDashboardData = async (req, res) => {
+  try {
+    const revenueByDay = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$dateOrdered" } },
+          totalRevenue: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+    const ordersByStatus = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const totalRevenue = await Order.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+    ]);
+
+    const totalOrders = await Order.countDocuments();
+
+    const avgOrderValue = totalRevenue[0].total / totalOrders;
+
+    res.json({
+      revenueByDay,
+      ordersByStatus,
+      totalRevenue: totalRevenue[0].total,
+      totalOrders,
+      avgOrderValue,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch dashboard data" });
+  }
+};
+export const getTopMenuItems = async (req, res) => {
+  try {
+    const topItems = await Order.aggregate([
+      { $unwind: "$menuItems" },
+      {
+        $group: {
+          _id: "$menuItems.menuItemId",
+          totalQuantity: { $sum: "$menuItems.quantity" },
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "menus",
+          localField: "_id",
+          foreignField: "_id",
+          as: "menuItem",
+        },
+      },
+      { $unwind: "$menuItem" },
+      {
+        $project: {
+          _id: 0,
+          menuItemId: "$_id",
+          name: "$menuItem.title",
+          imageUrl: "$menuItem.imageUrl",
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    res.json(topItems);
+  } catch (error) {
+    console.error("Error fetching top menu items:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getSalesPerformance = async (req, res) => {
+  try {
+    const { filter } = req.query;
+
+    let startDate;
+    const endDate = new Date();
+
+    let groupFormat;
+
+    switch (filter) {
+      case "today":
+        startDate = new Date(endDate);
+        startDate.setHours(0, 0, 0, 0);
+        groupFormat = "%Y-%m-%d";
+        break;
+      case "last7Days":
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 7);
+        groupFormat = "%Y-%m-%d";
+        break;
+      case "last30Days":
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 30);
+        groupFormat = "%Y-%m-%d";
+        break;
+      case "last6Months":
+        startDate = new Date(endDate);
+        startDate.setMonth(endDate.getMonth() - 6);
+        groupFormat = "%Y-%m";
+        break;
+      case "lastYear":
+        startDate = new Date(endDate);
+        startDate.setFullYear(endDate.getFullYear() - 1);
+        groupFormat = "%Y-%m";
+        break;
+      default:
+        startDate = new Date(0);
+        groupFormat = "%Y-%m";
+        break;
+    }
+
+    endDate.setHours(23, 59, 59, 999);
+
+    const salesPerformance = await Order.aggregate([
+      {
+        $match: {
+          dateOrdered: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: groupFormat, date: "$dateOrdered" },
+          },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.json(salesPerformance);
+  } catch (error) {
+    console.error("Error fetching sales performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getRecentOrders = async (req, res) => {
+  try {
+    const recentOrders = await Order.find().sort({ dateOrdered: -1 }).limit(5);
+
+    res.json(recentOrders);
+  } catch (error) {
+    console.error("Error fetching recent orders:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getUserActivity = async (req, res) => {
+  try {
+    const newUsers = await User.countDocuments({
+      createdAt: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    });
+    const activeUsers = await User.countDocuments({
+      lastLogin: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    });
+
+    res.json({ newUsers, activeUsers });
+  } catch (error) {
+    console.error("Error fetching user activity:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+

@@ -1,4 +1,5 @@
 import Reservation from "../models/reservations.model.js";
+import Query from "../models/queries.model.js";
 
 export const test = (req, res) => {
   res.json({ message: "Hello World!" });
@@ -13,7 +14,7 @@ export const signout = (req, res, next) => {
 };
 
 export const makeReservation = async (req, res, next) => {
-  const { name, email, phone, date, time, people, message,branch } = req.body;
+  const { name, email, phone, date, time, people, message, branch } = req.body;
 
   if (!name || !email || !phone || !date || !time || !people || !branch) {
     return res
@@ -38,6 +39,23 @@ export const makeReservation = async (req, res, next) => {
       message:
         "Reservation has been made Successfully Confirmations will be sent to your email",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addQuery = async (req, res, next) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+  try {
+    const query = await Query.create({ name, email, message });
+    return res
+      .status(201)
+      .json({ success: true, message: "Query Added Successfully" });
   } catch (error) {
     next(error);
   }
