@@ -49,6 +49,11 @@ export const signin = async (req, res, next) => {
     if (!isPasswordValid) {
       return next(errorHandler(400, "Invalid password"));
     }
+
+    // Update lastLogin field
+    user.lastLogin = new Date();
+    await user.save();
+
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin, isStaff: user.isStaff },
       process.env.JWT_SECRET,
@@ -71,9 +76,13 @@ export const google = async (req, res, next) => {
   const { name, email, googlePhotoUrl } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
     if (user) {
+      // Update lastLogin field
+      user.lastLogin = new Date();
+      await user.save();
+
       const token = jwt.sign(
         { id: user._id, isAdmin: user.isAdmin, isStaff: user.isStaff },
         process.env.JWT_SECRET,
@@ -101,8 +110,10 @@ export const google = async (req, res, next) => {
         email,
         password: hashedPassword,
         profilePicture: googlePhotoUrl,
+        lastLogin: new Date(),
       });
       await newUser.save();
+
       const token = jwt.sign(
         { id: newUser._id, isAdmin: newUser.isAdmin, isStaff: newUser.isStaff },
         process.env.JWT_SECRET,
@@ -120,5 +131,7 @@ export const google = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    return next(errorHandler(500, "Internal Server Error"));
   }
 };
+

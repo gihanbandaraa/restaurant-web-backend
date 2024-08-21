@@ -4,6 +4,9 @@ import {
   getCategories,
   updateCategory,
   deleteCategory,
+  getSalesPerformance,
+  getRecentOrders,
+  getUserActivity,
 } from "../controller/admin.controller.js";
 import {
   addMenu,
@@ -46,6 +49,11 @@ import {
   deleteOffer,
 } from "../controller/admin.controller.js";
 
+import {
+  getDashboardData,
+  getTopMenuItems,
+} from "../controller/admin.controller.js";
+
 const router = express.Router();
 
 router.post("/add-category", addCategory);
@@ -82,5 +90,11 @@ router.post("/add-offer", addOffer);
 router.get("/get-offers", getOffers);
 router.put("/update-offer/:id", updateOffer);
 router.delete("/delete-offer/:id", deleteOffer);
+
+router.get("/get-dashboard-data", getDashboardData);
+router.get("/top-menu-items", getTopMenuItems);
+router.get("/sales-performance", getSalesPerformance);
+router.get("/recent-orders", getRecentOrders);
+router.get("/user-activity", getUserActivity);
 
 export default router;
