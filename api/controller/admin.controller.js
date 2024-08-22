@@ -7,7 +7,6 @@ import Query from "../models/queries.model.js";
 import Reservation from "../models/reservations.model.js";
 import User from "../models/user.model.js";
 
-
 import {
   sendConfirmationEmail,
   sendRejectionEmail,
@@ -15,7 +14,7 @@ import {
   sendOrderReadyEmail,
   sendOrderDeliveredEmail,
   sendQueryReplyEmail,
-} from "../utils/mailer.js"; 
+} from "../utils/mailer.js";
 
 //Related to Category
 export const addCategory = async (req, res, next) => {
@@ -85,7 +84,7 @@ export const getCategories = async (req, res, next) => {
 //Related to Menu
 export const addMenu = async (req, res, next) => {
   const { title, description, imageUrl, price, category, offers } = req.body;
-  if (!title || !description || !imageUrl || !price || !category || !offers) {
+  if (!title || !description || !imageUrl || !price || !category ) {
     return res
       .status(400)
       .json({ success: false, message: "All fields are required" });
@@ -798,3 +797,47 @@ export const getUserActivity = async (req, res) => {
   }
 };
 
+export const getAllStaff = async (req, res, next) => {
+  try {
+    const staff = await User.find({ isStaff: true });
+    res.status(200).json(staff);
+  } catch (error) {
+    next(errorHandler(500, "Error fetching staff accounts"));
+  }
+};
+
+export const updateStaffAccount = async (req, res, next) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  try {
+    const updatedStaff = await User.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true }
+    );
+
+    if (!updatedStaff || !updatedStaff.isStaff) {
+      return next(errorHandler(404, "Staff account not found"));
+    }
+
+    res.status(200).json(updatedStaff);
+  } catch (error) {
+    next(errorHandler(500, "Error updating staff account"));
+  }
+};
+export const deleteStaffAccount = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const deletedStaff = await User.findByIdAndDelete(id);
+
+    if (!deletedStaff || !deletedStaff.isStaff) {
+      return next(errorHandler(404, "Staff account not found"));
+    }
+
+    res.status(200).json({ message: "Staff account deleted successfully" });
+  } catch (error) {
+    next(errorHandler(500, "Error deleting staff account"));
+  }
+};
