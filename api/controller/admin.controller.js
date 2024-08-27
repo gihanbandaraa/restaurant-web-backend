@@ -490,6 +490,9 @@ export const markOrderAsReady = async (req, res, next) => {
         orderId: order.orderId,
         items,
         branch: order.branch,
+        totalPrice: order.totalPrice,
+        shippingAddress: order.shippingAddress,
+        city: order.city,
       });
       console.log("Order ready email sent successfully");
     } catch (emailError) {
@@ -533,6 +536,9 @@ export const markOrderAsDelivered = async (req, res, next) => {
         orderId: order.orderId,
         items,
         branch: order.branch,
+        totalPrice: order.totalPrice,
+        shippingAddress: order.shippingAddress,
+        city: order.city,
       });
       console.log("Order delivered email sent successfully");
     } catch (emailError) {
