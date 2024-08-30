@@ -84,7 +84,7 @@ export const getCategories = async (req, res, next) => {
 //Related to Menu
 export const addMenu = async (req, res, next) => {
   const { title, description, imageUrl, price, category, offers } = req.body;
-  if (!title || !description || !imageUrl || !price || !category ) {
+  if (!title || !description || !imageUrl || !price || !category) {
     return res
       .status(400)
       .json({ success: false, message: "All fields are required" });
@@ -187,7 +187,7 @@ export const getCategoryCounts = async (req, res, next) => {
         },
       },
     ]);
-
+  
     return res.status(200).json(counts);
   } catch (error) {
     next(error);

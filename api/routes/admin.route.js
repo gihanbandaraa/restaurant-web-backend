@@ -66,6 +66,7 @@ router.post("/add-category", addCategory);
 router.get("/get-categories", getCategories);
 router.put("/update-category/:id", updateCategory);
 router.delete("/delete-category/:id", deleteCategory);
+router.get("/get-category-counts", getCategoryCounts);
 
 router.post("/add-menu", addMenu);
 router.get("/get-menu", getMenu);
@@ -73,7 +74,6 @@ router.get("/get-menu-category/:categoryId", getMenuByCategory);
 router.put("/update-menu/:id", updateMenu);
 router.delete("/delete-menu/:id", deleteMenu);
 
-router.get("/get-category-counts", getCategoryCounts);
 
 router.post("/add-image", addImage);
 router.get("/get-images", getImages);
