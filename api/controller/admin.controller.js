@@ -237,6 +237,8 @@ export const deleteImage = async (req, res, next) => {
   }
 };
 
+
+
 //Manage Reservations
 export const getReservations = async (req, res, next) => {
   try {
@@ -302,6 +304,8 @@ export const rejectReservation = async (req, res) => {
     res.status(500).json({ message: "Failed to reject the reservation." });
   }
 };
+
+
 
 //Manage Queries
 
