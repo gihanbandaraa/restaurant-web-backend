@@ -1,26 +1,19 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import app from "../api/index"; // Adjust the path as needed
-import Menu from "../api/models/menu.model"; // Adjust the path as needed
-import Category from "../api/models/categories.model.js"; // Adjust the path as needed
+import app from "../api/index";
+import Menu from "../api/models/menu.model";
+import Category from "../api/models/categories.model.js";
 
 let mongoServer;
 
-// Setup before all tests
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  // Seed data
+  await mongoose.connect(uri);
   await Category.create({ name: "Category1" });
 });
 
-// Cleanup after all tests
 afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
@@ -30,7 +23,6 @@ describe("Menu API", () => {
   let categoryId;
 
   beforeEach(async () => {
-    // Get category ID for testing
     const category = await Category.findOne();
     categoryId = category._id;
   });
@@ -42,7 +34,7 @@ describe("Menu API", () => {
       imageUrl: "http://testurl.com/image.jpg",
       price: 9.99,
       category: categoryId,
-      offers: "10% off", // Now a string
+      offers: "10% off",
     });
 
     expect(response.status).toBe(201);
@@ -65,14 +57,13 @@ describe("Menu API", () => {
   });
 
   test("PUT /api/admin/update-menu/:id - should update a menu item", async () => {
-    // Create a menu item first
     const menu = await Menu.create({
       title: "Old Title",
       description: "Old Description",
       imageUrl: "http://testurl.com/oldimage.jpg",
       price: 5.99,
       category: categoryId,
-      offers: "20% off", // Now a string
+      offers: "20% off",
     });
 
     const response = await request(app)
@@ -83,7 +74,7 @@ describe("Menu API", () => {
         imageUrl: "http://testurl.com/newimage.jpg",
         price: 6.99,
         category: categoryId,
-        offers: "25% off", // Now a string
+        offers: "25% off",
       });
 
     expect(response.status).toBe(200);
@@ -92,14 +83,13 @@ describe("Menu API", () => {
   });
 
   test("DELETE /api/admin/delete-menu/:id - should delete a menu item", async () => {
-    // Create a menu item first
     const menu = await Menu.create({
       title: "Item to Delete",
       description: "Description",
       imageUrl: "http://testurl.com/deleteimage.jpg",
       price: 7.99,
       category: categoryId,
-      offers: "30% off", // Now a string
+      offers: "30% off",
     });
 
     const response = await request(app).delete(
