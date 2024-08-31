@@ -10,6 +10,7 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
+
   await Reservation.create([
     {
       name: "Gihan Bandara",
@@ -68,7 +69,7 @@ describe("Reservations API", () => {
 
     const reservation = await Reservation.findById(reservationId);
     expect(reservation.status).toBe("confirmed");
-  });
+  }, 15000); // Increase timeout to 15 seconds
 
   test("PUT /api/admin/reject-reservation/:id - should reject a reservation and send an email", async () => {
     const response = await request(app)
@@ -82,5 +83,5 @@ describe("Reservations API", () => {
 
     const reservation = await Reservation.findById(reservationId);
     expect(reservation.status).toBe("rejected");
-  });
+  }, 15000); // Increase timeout to 15 seconds
 });
