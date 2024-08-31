@@ -87,15 +87,17 @@ router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
 router.put("/reply-query/:id", replyQuery);
 
-router.post("/add-order", addOrder);
-router.get("/get-orders", getOrders);
-router.put("/mark-order-as-ready/:id", markOrderAsReady);
-router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
 
 router.post("/add-offer", addOffer);
 router.get("/get-offers", getOffers);
 router.put("/update-offer/:id", updateOffer);
 router.delete("/delete-offer/:id", deleteOffer);
+
+router.post("/add-order", addOrder);
+router.get("/get-orders", getOrders);
+router.put("/mark-order-as-ready/:id", markOrderAsReady);
+router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
+
 
 router.get("/get-dashboard-data", getDashboardData);
 router.get("/top-menu-items", getTopMenuItems);
