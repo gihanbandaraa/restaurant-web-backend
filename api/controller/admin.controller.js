@@ -364,6 +364,8 @@ export const replyQuery = async (req, res, next) => {
   }
 };
 
+
+
 //Related Manage Orders
 
 export const addOrder = async (req, res, next) => {
@@ -558,6 +560,8 @@ export const markOrderAsDelivered = async (req, res, next) => {
   }
 };
 
+
+
 //Related to Offers
 export const addOffer = async (req, res, next) => {
   const { title, description, imageUrl, buttonText } = req.body;
@@ -628,6 +632,8 @@ export const deleteOffer = async (req, res, next) => {
     next(error);
   }
 };
+
+
 
 //Admin Dashboard
 
