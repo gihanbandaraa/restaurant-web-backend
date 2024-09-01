@@ -11,8 +11,8 @@ beforeAll(async () => {
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
 
-  // Seed data
-  await Query.create([
+
+await Query.create([
     {
       name: "Gihan Bandara",
       email: "gihanbandara999@gmail.com",
