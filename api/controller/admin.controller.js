@@ -187,7 +187,7 @@ export const getCategoryCounts = async (req, res, next) => {
         },
       },
     ]);
-  
+
     return res.status(200).json(counts);
   } catch (error) {
     next(error);
@@ -236,8 +236,6 @@ export const deleteImage = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 //Manage Reservations
 export const getReservations = async (req, res, next) => {
@@ -305,8 +303,6 @@ export const rejectReservation = async (req, res) => {
   }
 };
 
-
-
 //Manage Queries
 
 export const getQueries = async (req, res, next) => {
@@ -363,8 +359,6 @@ export const replyQuery = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 //Related Manage Orders
 
@@ -560,8 +554,6 @@ export const markOrderAsDelivered = async (req, res, next) => {
   }
 };
 
-
-
 //Related to Offers
 export const addOffer = async (req, res, next) => {
   const { title, description, imageUrl, buttonText } = req.body;
@@ -632,8 +624,6 @@ export const deleteOffer = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 //Admin Dashboard
 
@@ -812,6 +802,207 @@ export const getUserActivity = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getSalesSummary = async (req, res) => {
+  try {
+    const { period } = req.query;
+
+    let matchCondition = {};
+    let groupByFormat = "%Y-%m-%d";
+
+    switch (period) {
+      case "weekly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+          },
+        };
+        groupByFormat = "%Y-%W";
+        break;
+      case "monthly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+          },
+        };
+        groupByFormat = "%Y-%m";
+        break;
+      default:
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 1)),
+          },
+        };
+    }
+
+    const salesSummary = await Order.aggregate([
+      { $match: matchCondition },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: groupByFormat, date: "$dateOrdered" },
+          },
+          totalRevenue: { $sum: "$totalPrice" },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.json(salesSummary);
+  } catch (error) {
+    console.error("Error fetching sales summary:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+export const generateFullReport = async (req, res) => {
+  try {
+    // Revenue by Day
+    const revenueByDay = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$dateOrdered" } },
+          totalRevenue: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Orders by Status
+    const ordersByStatus = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Total Revenue
+    const totalRevenue = await Order.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+    ]);
+
+    // Total Orders
+    const totalOrders = await Order.countDocuments();
+
+    // Average Order Value
+    const avgOrderValue = totalRevenue[0].total / totalOrders;
+
+    // Top Menu Items
+    const topItems = await Order.aggregate([
+      { $unwind: "$menuItems" },
+      {
+        $group: {
+          _id: "$menuItems.menuItemId",
+          totalQuantity: { $sum: "$menuItems.quantity" },
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "menus",
+          localField: "_id",
+          foreignField: "_id",
+          as: "menuItem",
+        },
+      },
+      { $unwind: "$menuItem" },
+      {
+        $project: {
+          _id: 0,
+          menuItemId: "$_id",
+          name: "$menuItem.title",
+          imageUrl: "$menuItem.imageUrl",
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    // Recent Orders
+    const recentOrders = await Order.find().sort({ dateOrdered: -1 }).limit(5);
+
+    // User Activity
+    const newUsers = await User.countDocuments({
+      createdAt: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    });
+    const activeUsers = await User.countDocuments({
+      lastLogin: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    });
+
+    // Sales Summary
+    const { period } = req.query;
+    let matchCondition = {};
+    let groupByFormat = "%Y-%m-%d";
+
+    switch (period) {
+      case "weekly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+          },
+        };
+        groupByFormat = "%Y-%W";
+        break;
+      case "monthly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+          },
+        };
+        groupByFormat = "%Y-%m";
+        break;
+      default:
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 1)),
+          },
+        };
+    }
+
+    const salesSummary = await Order.aggregate([
+      { $match: matchCondition },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: groupByFormat, date: "$dateOrdered" },
+          },
+          totalRevenue: { $sum: "$totalPrice" },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Compile All Data into a Report
+    res.json({
+      revenueByDay,
+      ordersByStatus,
+      totalRevenue: totalRevenue[0].total,
+      totalOrders,
+      avgOrderValue,
+      topItems,
+      recentOrders,
+      userActivity: {
+        newUsers,
+        activeUsers
+      },
+      salesSummary
+    });
+  } catch (error) {
+    console.error("Error generating full report:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Manage Staff Accounts
 
 export const getAllStaff = async (req, res, next) => {
   try {

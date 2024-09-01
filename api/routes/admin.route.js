@@ -52,6 +52,8 @@ import {
 import {
   getDashboardData,
   getTopMenuItems,
+  getSalesSummary,
+  generateFullReport
 } from "../controller/admin.controller.js";
 
 import {
@@ -74,7 +76,6 @@ router.get("/get-menu-category/:categoryId", getMenuByCategory);
 router.put("/update-menu/:id", updateMenu);
 router.delete("/delete-menu/:id", deleteMenu);
 
-
 router.post("/add-image", addImage);
 router.get("/get-images", getImages);
 router.delete("/delete-image/:id", deleteImage);
@@ -87,7 +88,6 @@ router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
 router.put("/reply-query/:id", replyQuery);
 
-
 router.post("/add-offer", addOffer);
 router.get("/get-offers", getOffers);
 router.put("/update-offer/:id", updateOffer);
@@ -98,12 +98,13 @@ router.get("/get-orders", getOrders);
 router.put("/mark-order-as-ready/:id", markOrderAsReady);
 router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
 
-
 router.get("/get-dashboard-data", getDashboardData);
 router.get("/top-menu-items", getTopMenuItems);
 router.get("/sales-performance", getSalesPerformance);
 router.get("/recent-orders", getRecentOrders);
 router.get("/user-activity", getUserActivity);
+router.get("/sales-summary", getSalesSummary);
+router.get("/generate-full-report", generateFullReport);
 
 router.get("/get-all-staff", getAllStaff);
 router.put("/update-staff-account/:id", updateStaffAccount);
