@@ -52,6 +52,8 @@ import {
 import {
   getDashboardData,
   getTopMenuItems,
+  getSalesSummary,
+  generateFullReport
 } from "../controller/admin.controller.js";
 
 import {
@@ -66,14 +68,13 @@ router.post("/add-category", addCategory);
 router.get("/get-categories", getCategories);
 router.put("/update-category/:id", updateCategory);
 router.delete("/delete-category/:id", deleteCategory);
+router.get("/get-category-counts", getCategoryCounts);
 
 router.post("/add-menu", addMenu);
 router.get("/get-menu", getMenu);
 router.get("/get-menu-category/:categoryId", getMenuByCategory);
 router.put("/update-menu/:id", updateMenu);
 router.delete("/delete-menu/:id", deleteMenu);
-
-router.get("/get-category-counts", getCategoryCounts);
 
 router.post("/add-image", addImage);
 router.get("/get-images", getImages);
@@ -87,21 +88,23 @@ router.get("/get-queries", getQueries);
 router.delete("/delete-query/:id", deleteQuery);
 router.put("/reply-query/:id", replyQuery);
 
-router.post("/add-order", addOrder);
-router.get("/get-orders", getOrders);
-router.put("/mark-order-as-ready/:id", markOrderAsReady);
-router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
-
 router.post("/add-offer", addOffer);
 router.get("/get-offers", getOffers);
 router.put("/update-offer/:id", updateOffer);
 router.delete("/delete-offer/:id", deleteOffer);
+
+router.post("/add-order", addOrder);
+router.get("/get-orders", getOrders);
+router.put("/mark-order-as-ready/:id", markOrderAsReady);
+router.put("/mark-order-as-delivered/:id", markOrderAsDelivered);
 
 router.get("/get-dashboard-data", getDashboardData);
 router.get("/top-menu-items", getTopMenuItems);
 router.get("/sales-performance", getSalesPerformance);
 router.get("/recent-orders", getRecentOrders);
 router.get("/user-activity", getUserActivity);
+router.get("/sales-summary", getSalesSummary);
+router.get("/generate-full-report", generateFullReport);
 
 router.get("/get-all-staff", getAllStaff);
 router.put("/update-staff-account/:id", updateStaffAccount);

@@ -16,6 +16,8 @@ import {
   sendQueryReplyEmail,
 } from "../utils/mailer.js";
 
+
+
 //Related to Category
 export const addCategory = async (req, res, next) => {
   const { name } = req.body;
@@ -32,7 +34,6 @@ export const addCategory = async (req, res, next) => {
     next(error);
   }
 };
-
 export const updateCategory = async (req, res, next) => {
   const { name } = req.body;
   const { id } = req.params;
@@ -54,7 +55,6 @@ export const updateCategory = async (req, res, next) => {
     next(error);
   }
 };
-
 export const deleteCategory = async (req, res, next) => {
   const { id } = req.params;
 
@@ -71,7 +71,6 @@ export const deleteCategory = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getCategories = async (req, res, next) => {
   try {
     const categories = await Category.find();
@@ -84,7 +83,7 @@ export const getCategories = async (req, res, next) => {
 //Related to Menu
 export const addMenu = async (req, res, next) => {
   const { title, description, imageUrl, price, category, offers } = req.body;
-  if (!title || !description || !imageUrl || !price || !category ) {
+  if (!title || !description || !imageUrl || !price || !category) {
     return res
       .status(400)
       .json({ success: false, message: "All fields are required" });
@@ -105,7 +104,6 @@ export const addMenu = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getMenu = async (req, res, next) => {
   try {
     const menu = await Menu.find();
@@ -114,7 +112,6 @@ export const getMenu = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getMenuByCategory = async (req, res, next) => {
   const { categoryId } = req.params;
   try {
@@ -124,7 +121,6 @@ export const getMenuByCategory = async (req, res, next) => {
     next(error);
   }
 };
-
 export const updateMenu = async (req, res, next) => {
   const { title, description, imageUrl, price, category, offers } = req.body;
   const { id } = req.params;
@@ -148,10 +144,8 @@ export const updateMenu = async (req, res, next) => {
     next(error);
   }
 };
-
 export const deleteMenu = async (req, res, next) => {
   const { id } = req.params;
-
   try {
     const menu = await Menu.findByIdAndDelete(id);
 
@@ -167,7 +161,6 @@ export const deleteMenu = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getCategoryCounts = async (req, res, next) => {
   try {
     const counts = await Category.aggregate([
@@ -211,7 +204,6 @@ export const addImage = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getImages = async (req, res, next) => {
   try {
     const images = await Gallery.find();
@@ -220,7 +212,6 @@ export const getImages = async (req, res, next) => {
     next(error);
   }
 };
-
 export const deleteImage = async (req, res, next) => {
   const { id } = req.params;
 
@@ -251,7 +242,6 @@ export const getReservations = async (req, res, next) => {
     next(error);
   }
 };
-
 export const confirmReservation = async (req, res) => {
   try {
     const reservation = await Reservation.findByIdAndUpdate(
@@ -283,7 +273,6 @@ export const confirmReservation = async (req, res) => {
     res.status(500).json({ message: "Failed to confirm the reservation." });
   }
 };
-
 export const rejectReservation = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
@@ -304,7 +293,6 @@ export const rejectReservation = async (req, res) => {
 };
 
 //Manage Queries
-
 export const getQueries = async (req, res, next) => {
   try {
     const queries = await Query.find();
@@ -313,7 +301,6 @@ export const getQueries = async (req, res, next) => {
     next(error);
   }
 };
-
 export const deleteQuery = async (req, res, next) => {
   const { id } = req.params;
 
@@ -329,7 +316,6 @@ export const deleteQuery = async (req, res, next) => {
     next(error);
   }
 };
-
 export const replyQuery = async (req, res, next) => {
   const { id } = req.params;
   const { subject, message, receiverEmail, status } = req.body;
@@ -361,7 +347,6 @@ export const replyQuery = async (req, res, next) => {
 };
 
 //Related Manage Orders
-
 export const addOrder = async (req, res, next) => {
   const {
     user,
@@ -437,7 +422,6 @@ export const addOrder = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getOrders = async (req, res, next) => {
   try {
     const { status, sortBy, sortOrder, branch, user } = req.query;
@@ -461,7 +445,6 @@ export const getOrders = async (req, res, next) => {
     next(error);
   }
 };
-
 export const markOrderAsReady = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id).populate(
@@ -490,6 +473,9 @@ export const markOrderAsReady = async (req, res, next) => {
         orderId: order.orderId,
         items,
         branch: order.branch,
+        totalPrice: order.totalPrice,
+        shippingAddress: order.shippingAddress,
+        city: order.city,
       });
       console.log("Order ready email sent successfully");
     } catch (emailError) {
@@ -504,7 +490,6 @@ export const markOrderAsReady = async (req, res, next) => {
     res.status(500).json({ message: "Failed to mark order as ready." });
   }
 };
-
 export const markOrderAsDelivered = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id).populate(
@@ -533,6 +518,9 @@ export const markOrderAsDelivered = async (req, res, next) => {
         orderId: order.orderId,
         items,
         branch: order.branch,
+        totalPrice: order.totalPrice,
+        shippingAddress: order.shippingAddress,
+        city: order.city,
       });
       console.log("Order delivered email sent successfully");
     } catch (emailError) {
@@ -547,6 +535,7 @@ export const markOrderAsDelivered = async (req, res, next) => {
     res.status(500).json({ message: "Failed to mark order as delivered." });
   }
 };
+
 
 //Related to Offers
 export const addOffer = async (req, res, next) => {
@@ -570,7 +559,6 @@ export const addOffer = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getOffers = async (req, res, next) => {
   try {
     const offers = await Offers.find();
@@ -579,7 +567,6 @@ export const getOffers = async (req, res, next) => {
     next(error);
   }
 };
-
 export const updateOffer = async (req, res, next) => {
   const { title, description, imageUrl, buttonText } = req.body;
   const { id } = req.params;
@@ -601,7 +588,6 @@ export const updateOffer = async (req, res, next) => {
     next(error);
   }
 };
-
 export const deleteOffer = async (req, res, next) => {
   const { id } = req.params;
 
@@ -619,8 +605,9 @@ export const deleteOffer = async (req, res, next) => {
   }
 };
 
-//Admin Dashboard
 
+
+//Admin Dashboard
 export const getDashboardData = async (req, res) => {
   try {
     const revenueByDay = await Order.aggregate([
@@ -698,7 +685,6 @@ export const getTopMenuItems = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 export const getSalesPerformance = async (req, res) => {
   try {
     const { filter } = req.query;
@@ -765,7 +751,6 @@ export const getSalesPerformance = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 export const getRecentOrders = async (req, res) => {
   try {
     const recentOrders = await Order.find().sort({ dateOrdered: -1 }).limit(5);
@@ -776,7 +761,6 @@ export const getRecentOrders = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 export const getUserActivity = async (req, res) => {
   try {
     const newUsers = await User.countDocuments({
@@ -796,7 +780,204 @@ export const getUserActivity = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+export const getSalesSummary = async (req, res) => {
+  try {
+    const { period } = req.query;
 
+    let matchCondition = {};
+    let groupByFormat = "%Y-%m-%d";
+
+    switch (period) {
+      case "weekly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+          },
+        };
+        groupByFormat = "%Y-%W";
+        break;
+      case "monthly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+          },
+        };
+        groupByFormat = "%Y-%m";
+        break;
+      default:
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 1)),
+          },
+        };
+    }
+
+    const salesSummary = await Order.aggregate([
+      { $match: matchCondition },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: groupByFormat, date: "$dateOrdered" },
+          },
+          totalRevenue: { $sum: "$totalPrice" },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.json(salesSummary);
+  } catch (error) {
+    console.error("Error fetching sales summary:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const generateFullReport = async (req, res) => {
+  try {
+    // Revenue by Day
+    const revenueByDay = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$dateOrdered" } },
+          totalRevenue: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Orders by Status
+    const ordersByStatus = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Total Revenue
+    const totalRevenue = await Order.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+    ]);
+
+    // Total Orders
+    const totalOrders = await Order.countDocuments();
+
+    // Average Order Value
+    const avgOrderValue = totalRevenue[0].total / totalOrders;
+
+    // Top Menu Items
+    const topItems = await Order.aggregate([
+      { $unwind: "$menuItems" },
+      {
+        $group: {
+          _id: "$menuItems.menuItemId",
+          totalQuantity: { $sum: "$menuItems.quantity" },
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "menus",
+          localField: "_id",
+          foreignField: "_id",
+          as: "menuItem",
+        },
+      },
+      { $unwind: "$menuItem" },
+      {
+        $project: {
+          _id: 0,
+          menuItemId: "$_id",
+          name: "$menuItem.title",
+          imageUrl: "$menuItem.imageUrl",
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    // Recent Orders
+    const recentOrders = await Order.find().sort({ dateOrdered: -1 }).limit(5);
+
+    // User Activity
+    const newUsers = await User.countDocuments({
+      createdAt: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    });
+    const activeUsers = await User.countDocuments({
+      lastLogin: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    });
+
+    // Sales Summary
+    const { period } = req.query;
+    let matchCondition = {};
+    let groupByFormat = "%Y-%m-%d";
+
+    switch (period) {
+      case "weekly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+          },
+        };
+        groupByFormat = "%Y-%W";
+        break;
+      case "monthly":
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+          },
+        };
+        groupByFormat = "%Y-%m";
+        break;
+      default:
+        matchCondition = {
+          dateOrdered: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 1)),
+          },
+        };
+    }
+
+    const salesSummary = await Order.aggregate([
+      { $match: matchCondition },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: groupByFormat, date: "$dateOrdered" },
+          },
+          totalRevenue: { $sum: "$totalPrice" },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Compile All Data into a Report
+    res.json({
+      revenueByDay,
+      ordersByStatus,
+      totalRevenue: totalRevenue[0].total,
+      totalOrders,
+      avgOrderValue,
+      topItems,
+      recentOrders,
+      userActivity: {
+        newUsers,
+        activeUsers
+      },
+      salesSummary
+    });
+  } catch (error) {
+    console.error("Error generating full report:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Manage Staff Accounts
 export const getAllStaff = async (req, res, next) => {
   try {
     const staff = await User.find({ isStaff: true });
@@ -805,7 +986,6 @@ export const getAllStaff = async (req, res, next) => {
     next(errorHandler(500, "Error fetching staff accounts"));
   }
 };
-
 export const updateStaffAccount = async (req, res, next) => {
   const { id } = req.params;
   const updates = req.body;
