@@ -301,7 +301,6 @@ export const getQueries = async (req, res, next) => {
     next(error);
   }
 };
-
 export const deleteQuery = async (req, res, next) => {
   const { id } = req.params;
 

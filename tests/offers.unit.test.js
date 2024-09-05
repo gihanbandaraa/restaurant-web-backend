@@ -1,4 +1,4 @@
-import { addOffer, getOffers, updateOffer } from '../api/controller/admin.controller';
+import { addOffer, getOffers, updateOffer } from '../api/controller/admin.controller.js';
 import Offers from '../api/models/offers.model.js';
 
 jest.mock('../api/models/offers.model.js');

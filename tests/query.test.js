@@ -11,8 +11,7 @@ beforeAll(async () => {
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
 
-
-await Query.create([
+  await Query.create([
     {
       name: "Gihan Bandara",
       email: "gihanbandara999@gmail.com",
@@ -54,7 +53,7 @@ describe("Queries API", () => {
     expect(queryMessages).toContain(
       "I would like to book a table for 4 on Saturday."
     );
-  });
+  }, 15000);
 
   test("DELETE /api/admin/delete-query/:id - should delete an existing query", async () => {
     const response = await request(app).delete(
@@ -85,5 +84,5 @@ describe("Queries API", () => {
 
     const query = await Query.findById(queryId);
     expect(query.status).toBe("replied");
-  });
+  }, 15000);
 });

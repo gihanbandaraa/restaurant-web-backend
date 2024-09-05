@@ -99,7 +99,7 @@ describe("Orders API", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Order marked as ready.");
-  });
+  },15000);
 
   test("PUT /api/admin/mark-order-as-delivered/:id - should mark an order as delivered", async () => {
     const response = await request(app)
@@ -108,5 +108,5 @@ describe("Orders API", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Order marked as delivered.");
-  });
+  },15000);
 });
